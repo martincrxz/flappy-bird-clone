@@ -9,10 +9,12 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 )
 
-func main() {
-	width := int32(600)
-	height := int32(600)
+const (
+	width  = 800
+	height = 600
+)
 
+func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		fmt.Printf("could not initialize SDL, %v\n", err)
 	}
@@ -29,11 +31,11 @@ func main() {
 	}
 	defer window.Destroy()
 
-	startScreen, err := newStartScreen(renderer)
+	scene, err := newScene(renderer)
 	if err != nil {
-		fmt.Printf("could not create new start screen, %v", err)
+		fmt.Printf("could not create new sceen, %v", err)
 	}
-	defer startScreen.destroy()
+	defer scene.destroy()
 
 	sdl.PumpEvents()
 
@@ -45,13 +47,13 @@ func main() {
 	time.Sleep(2 * time.Second)
 
 	events := make(chan sdl.Event)
-	errc := startScreen.run(events, renderer)
+	sceenErrc := scene.run(events, renderer)
 	runtime.LockOSThread()
 
 	for {
 		select {
 		case events <- sdl.WaitEvent():
-		case err = <-errc:
+		case err = <-sceenErrc:
 			if err != nil {
 				fmt.Printf("runtime error, %v\n", err)
 			}

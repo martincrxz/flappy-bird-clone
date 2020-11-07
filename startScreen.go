@@ -5,7 +5,6 @@ import (
 
 	"github.com/veandco/go-sdl2/ttf"
 
-	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -16,24 +15,20 @@ const (
 	quitGame                    = "quitGame"
 )
 
-var startNewGameDst sdl.Rect = sdl.Rect{X: 300 - 80, Y: 300, W: 160, H: 48}
-var quitGameDst sdl.Rect = sdl.Rect{X: 300 - 50, Y: 400, W: 100, H: 48}
+var startNewGameDst sdl.Rect = sdl.Rect{X: width/2 - 80, Y: 300, W: 160, H: 40}
+var quitGameDst sdl.Rect = sdl.Rect{X: width/2 - 50, Y: 400, W: 100, H: 40}
 
 type startScreen struct {
-	background         *sdl.Texture
 	option             selectedOption
 	whiteStartNewGame  *sdl.Texture
 	yellowStartNewGame *sdl.Texture
 	whiteQuitGame      *sdl.Texture
 	yellowQuitGame     *sdl.Texture
+	scene              *scene
+	running            bool
 }
 
 func newStartScreen(r *sdl.Renderer) (*startScreen, error) {
-	background, err := img.LoadTexture(r, "res/img/background.png")
-	if err != nil {
-		return nil, fmt.Errorf("could not load background, %v", err)
-	}
-
 	font, err := ttf.OpenFont("res/font/Anton-Regular.ttf", 48)
 	if err != nil {
 		return nil, fmt.Errorf("could not open font, %v", err)
@@ -85,68 +80,22 @@ func newStartScreen(r *sdl.Renderer) (*startScreen, error) {
 	}
 
 	return &startScreen{
-		background:         background,
 		option:             startNewGame,
 		whiteStartNewGame:  wsngTexture,
 		yellowStartNewGame: ysngTexture,
 		whiteQuitGame:      wqgTexture,
-		yellowQuitGame:     yqgTexture}, nil
+		yellowQuitGame:     yqgTexture,
+		running:            true}, nil
 }
 
 func (ss *startScreen) destroy() {
-	ss.background.Destroy()
 	ss.whiteStartNewGame.Destroy()
 	ss.yellowStartNewGame.Destroy()
 	ss.whiteQuitGame.Destroy()
 	ss.yellowQuitGame.Destroy()
 }
 
-func (ss *startScreen) handleEvent(event sdl.Event) bool {
-	switch t := event.(type) {
-	case *sdl.QuitEvent:
-		return true
-	case *sdl.KeyboardEvent:
-		if t.Keysym.Sym == sdl.K_UP && t.State == sdl.PRESSED {
-			if ss.option == startNewGame {
-				ss.option = quitGame
-			} else {
-				ss.option = startNewGame
-			}
-		}
-		if t.Keysym.Sym == sdl.K_DOWN && t.State == sdl.PRESSED {
-			if ss.option == startNewGame {
-				ss.option = quitGame
-			} else {
-				ss.option = startNewGame
-			}
-		}
-	default:
-	}
-	return false
-}
-
-func (ss *startScreen) run(events chan sdl.Event, renderer *sdl.Renderer) <-chan error {
-	errc := make(chan error)
-	go func() {
-		defer close(errc)
-		done := false
-		for !done {
-			select {
-			case event := <-events:
-				done = ss.handleEvent(event)
-				ss.paint(renderer)
-			}
-		}
-	}()
-	return errc
-}
-
 func (ss *startScreen) paint(r *sdl.Renderer) error {
-	r.Clear()
-	if err := r.Copy(ss.background, nil, nil); err != nil {
-		return fmt.Errorf("could not copy background, %v", err)
-	}
-
 	if ss.option == startNewGame {
 		if err := r.Copy(ss.yellowStartNewGame, nil, &startNewGameDst); err != nil {
 			return fmt.Errorf("could not copy text, %v", err)
@@ -164,7 +113,5 @@ func (ss *startScreen) paint(r *sdl.Renderer) error {
 			return fmt.Errorf("could not copy text, %v", err)
 		}
 	}
-
-	r.Present()
 	return nil
 }
