@@ -15,6 +15,7 @@ type pipe struct {
 	w        int32
 	x        int32
 	y        int32
+	scored   bool
 	inverted bool
 }
 
@@ -30,6 +31,7 @@ func newPipe() (*pipe, error) {
 		h:        100 + rand.Int31n(300),
 		w:        50,
 		x:        800,
+		scored:   false,
 		inverted: rand.Float32() < 0.5,
 	}, nil
 }
@@ -108,4 +110,20 @@ func (ps *pipes) hit(bird *bird) {
 		bird.hit(p)
 		p.mu.RUnlock()
 	}
+}
+
+func (ps *pipes) advance(bird *bird) bool {
+	for _, p := range ps.pipes {
+		if p.scored {
+			continue
+		} else {
+			if p.x < bird.x {
+				p.mu.RLock()
+				p.scored = true
+				p.mu.RUnlock()
+				return true
+			}
+		}
+	}
+	return false
 }

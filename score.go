@@ -50,3 +50,7 @@ func (sc *score) paint(r *sdl.Renderer) error {
 func (sc *score) destroy() {
 	sc.font.Close()
 }
+
+func (sc *score) addPoint() {
+	sc.points++
+}

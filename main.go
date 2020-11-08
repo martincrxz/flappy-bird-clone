@@ -14,7 +14,7 @@ const (
 	height = 600
 )
 
-var titleDst sdl.Rect = sdl.Rect{X: width/2 - 300, Y: 100, W: 600, H: 400}
+var titleDst sdl.Rect = sdl.Rect{X: width/2 - 300, Y: 150, W: 600, H: 300}
 
 func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {

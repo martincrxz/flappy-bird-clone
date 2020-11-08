@@ -60,6 +60,9 @@ func (s *scene) update() {
 		s.pipes.hit(s.bird)
 		s.bird.update()
 		s.pipes.update(s.time)
+		if s.pipes.advance(s.bird) {
+			s.score.addPoint()
+		}
 	}
 }
 
