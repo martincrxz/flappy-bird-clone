@@ -55,3 +55,21 @@ func (b *bird) paint(r *sdl.Renderer, t uint64) error {
 	}
 	return nil
 }
+
+func (b *bird) jump() {
+	if b.speed < 0 {
+		b.speed = 3
+	} else {
+		b.speed += 2
+	}
+}
+
+func (b *bird) isDead() bool {
+	return b.dead
+}
+
+func (b *bird) revive() {
+	b.speed = 0
+	b.y = initY
+	b.dead = false
+}

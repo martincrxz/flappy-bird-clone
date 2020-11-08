@@ -84,6 +84,9 @@ func (s *scene) run(events chan sdl.Event, renderer *sdl.Renderer) <-chan error 
 			case <-tick:
 				if s.playing {
 					s.update()
+					if s.bird.isDead() {
+						s.playing = false
+					}
 					if err := s.paint(renderer); err != nil {
 						errc <- err
 					}
@@ -101,6 +104,7 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 	case *sdl.KeyboardEvent:
 		if s.playing {
 			if t.Keysym.Sym == sdl.K_SPACE && t.State == sdl.PRESSED {
+				s.bird.jump()
 			}
 		} else {
 			if t.Keysym.Sym == sdl.K_UP && t.State == sdl.PRESSED {
@@ -120,6 +124,7 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 			if t.Keysym.Sym == sdl.K_RETURN && t.State == sdl.PRESSED {
 				if s.startScreen.option == startNewGame {
 					s.playing = true
+					s.bird.revive()
 				} else {
 					return true
 				}
