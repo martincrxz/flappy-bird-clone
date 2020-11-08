@@ -4,4 +4,6 @@ This is a clone of the famous game flappy bird. The main purpose of this project
 
 This is how it looks up to now:
 
-![Demo](https://github.com/martincrxz/flappy-bird-clone/blob/master/demo/flappy.gif)
+<p align="center">
+  <img src="demo/flappy.gif" alt="flappy-bird-demo" />
+</p>
