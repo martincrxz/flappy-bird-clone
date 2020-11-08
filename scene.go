@@ -13,7 +13,7 @@ type scene struct {
 	background  *sdl.Texture
 	startScreen *startScreen
 	bird        *bird
-	pipe        *pipe
+	pipes       *pipes
 	playing     bool
 }
 
@@ -33,7 +33,7 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		return nil, fmt.Errorf("could not create bird, %v: ", err)
 	}
 
-	pipe, err := newPipe(r)
+	pipes, err := newPipes(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not create pipe, %v", err)
 	}
@@ -42,7 +42,7 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		background:  background,
 		startScreen: startScreen,
 		bird:        bird,
-		pipe:        pipe,
+		pipes:       pipes,
 		playing:     false,
 	}, nil
 }
@@ -51,7 +51,7 @@ func (s *scene) update() {
 	if s.playing {
 		s.time++
 		s.bird.update()
-		s.pipe.update(s.time)
+		s.pipes.update(s.time)
 	}
 }
 
@@ -66,7 +66,7 @@ func (s *scene) paint(r *sdl.Renderer) error {
 			return fmt.Errorf("could not paint bird, %v: ", err)
 		}
 
-		if err := s.pipe.paint(r, s.time); err != nil {
+		if err := s.pipes.paint(r, s.time); err != nil {
 			return fmt.Errorf("could not paint pipe, %v: ", err)
 		}
 	} else {
@@ -118,6 +118,12 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 		if s.playing {
 			if t.Keysym.Sym == sdl.K_SPACE && t.State == sdl.PRESSED {
 				s.bird.jump()
+			}
+			if t.Keysym.Sym == sdl.K_LEFT && t.State == sdl.PRESSED {
+				s.bird.move(-5)
+			}
+			if t.Keysym.Sym == sdl.K_RIGHT && t.State == sdl.PRESSED {
+				s.bird.move(5)
 			}
 		} else {
 			if t.Keysym.Sym == sdl.K_UP && t.State == sdl.PRESSED {

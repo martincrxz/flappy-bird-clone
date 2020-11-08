@@ -11,6 +11,7 @@ const (
 	birdWidth  = 50
 	birdHeigth = 43
 	initY      = 300
+	initX      = 10
 	gravity    = 0.1
 )
 
@@ -36,6 +37,7 @@ func newBird(r *sdl.Renderer) (*bird, error) {
 	return &bird{
 		textures: textures,
 		y:        initY,
+		x:        initX,
 		dead:     false}, nil
 }
 
@@ -48,7 +50,7 @@ func (b *bird) update() {
 }
 
 func (b *bird) paint(r *sdl.Renderer, t uint64) error {
-	rect := &sdl.Rect{W: birdWidth, H: birdHeigth, X: 10, Y: 600 - b.y - int32(birdHeigth/2)}
+	rect := &sdl.Rect{W: birdWidth, H: birdHeigth, X: b.x, Y: 600 - b.y - int32(birdHeigth/2)}
 	texIndex := (t / 10) % uint64(len(b.textures))
 	if err := r.Copy(b.textures[texIndex], nil, rect); err != nil {
 		return fmt.Errorf("could not copy bird, %v", err)
@@ -71,5 +73,10 @@ func (b *bird) isDead() bool {
 func (b *bird) revive() {
 	b.speed = 0
 	b.y = initY
+	b.x = initX
 	b.dead = false
+}
+
+func (b *bird) move(m int) {
+	b.x += int32(m)
 }
