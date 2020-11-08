@@ -13,6 +13,7 @@ type scene struct {
 	background  *sdl.Texture
 	startScreen *startScreen
 	bird        *bird
+	pipe        *pipe
 	playing     bool
 }
 
@@ -32,17 +33,25 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		return nil, fmt.Errorf("could not create bird, %v: ", err)
 	}
 
+	pipe, err := newPipe(r)
+	if err != nil {
+		return nil, fmt.Errorf("could not create pipe, %v", err)
+	}
+
 	return &scene{
 		background:  background,
 		startScreen: startScreen,
 		bird:        bird,
-		playing:     false}, nil
+		pipe:        pipe,
+		playing:     false,
+	}, nil
 }
 
 func (s *scene) update() {
 	if s.playing {
 		s.time++
 		s.bird.update()
+		s.pipe.update(s.time)
 	}
 }
 
@@ -55,6 +64,10 @@ func (s *scene) paint(r *sdl.Renderer) error {
 	if s.playing {
 		if err := s.bird.paint(r, s.time); err != nil {
 			return fmt.Errorf("could not paint bird, %v: ", err)
+		}
+
+		if err := s.pipe.paint(r, s.time); err != nil {
+			return fmt.Errorf("could not paint pipe, %v: ", err)
 		}
 	} else {
 		if err := s.startScreen.paint(r); err != nil {
