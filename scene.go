@@ -12,6 +12,7 @@ type scene struct {
 	time        uint64
 	background  *sdl.Texture
 	startScreen *startScreen
+	bird        *bird
 	playing     bool
 }
 
@@ -26,14 +27,23 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		return nil, fmt.Errorf("could not create start screen, %v", err)
 	}
 
+	bird, err := newBird(r)
+	if err != nil {
+		return nil, fmt.Errorf("could not create bird, %v: ", err)
+	}
+
 	return &scene{
 		background:  background,
 		startScreen: startScreen,
+		bird:        bird,
 		playing:     false}, nil
 }
 
 func (s *scene) update() {
-	s.time++
+	if s.playing {
+		s.time++
+		s.bird.update()
+	}
 }
 
 func (s *scene) paint(r *sdl.Renderer) error {
@@ -42,7 +52,11 @@ func (s *scene) paint(r *sdl.Renderer) error {
 		return fmt.Errorf("could not copy background, %v", err)
 	}
 
-	if !s.playing {
+	if s.playing {
+		if err := s.bird.paint(r, s.time); err != nil {
+			return fmt.Errorf("could not paint bird, %v: ", err)
+		}
+	} else {
 		if err := s.startScreen.paint(r); err != nil {
 			return fmt.Errorf("could not paint start screen, %v", err)
 		}
