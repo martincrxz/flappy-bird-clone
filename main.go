@@ -14,6 +14,8 @@ const (
 	height = 600
 )
 
+var titleDst sdl.Rect = sdl.Rect{X: width/2 - 300, Y: 100, W: 600, H: 400}
+
 func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		fmt.Printf("could not initialize SDL, %v\n", err)
@@ -71,7 +73,7 @@ func drawTitle(r *sdl.Renderer, text string) error {
 	}
 	defer font.Close()
 
-	surface, err := font.RenderUTF8Solid(text, sdl.Color{R: 128, G: 140, B: 255, A: 255})
+	surface, err := font.RenderUTF8Solid(text, sdl.Color{R: 255, G: 255, B: 255, A: 255})
 	if err != nil {
 		return fmt.Errorf("could not render title, %v", err)
 	}
@@ -83,7 +85,7 @@ func drawTitle(r *sdl.Renderer, text string) error {
 	}
 	defer texture.Destroy()
 
-	err = r.Copy(texture, nil, nil)
+	err = r.Copy(texture, nil, &titleDst)
 	if err != nil {
 		return fmt.Errorf("could not copy texture, %v", err)
 	}

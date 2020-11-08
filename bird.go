@@ -61,6 +61,8 @@ func (b *bird) paint(r *sdl.Renderer, t uint64) error {
 func (b *bird) jump() {
 	if b.speed < 0 {
 		b.speed = 3
+	} else if b.speed > 6 {
+		b.speed = 6
 	} else {
 		b.speed += 2
 	}
