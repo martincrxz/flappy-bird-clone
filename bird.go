@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
@@ -16,6 +17,7 @@ const (
 )
 
 type bird struct {
+	mu       sync.RWMutex
 	textures []*sdl.Texture
 	speed    float64
 	y, x     int32
@@ -81,4 +83,23 @@ func (b *bird) revive() {
 
 func (b *bird) move(m int) {
 	b.x += int32(m)
+}
+
+func (b *bird) hit(p *pipe) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	if b.x+birdWidth < p.x {
+		return
+	}
+	if b.x > p.x+p.w {
+		return
+	}
+	if !p.inverted && b.y-birdHeigth/2 > p.h {
+		return
+	}
+	if p.inverted && height-p.h > b.y+birdHeigth/2 {
+		return
+	}
+	b.dead = true
 }

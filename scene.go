@@ -57,6 +57,7 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 func (s *scene) update() {
 	if s.playing {
 		s.time++
+		s.pipes.hit(s.bird)
 		s.bird.update()
 		s.pipes.update(s.time)
 	}
@@ -153,8 +154,7 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 			}
 			if t.Keysym.Sym == sdl.K_RETURN && t.State == sdl.PRESSED {
 				if s.startScreen.option == startNewGame {
-					s.playing = true
-					s.bird.revive()
+					s.restart()
 				} else {
 					return true
 				}
@@ -166,6 +166,9 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 }
 
 func (s *scene) restart() {
+	s.playing = true
+	s.bird.revive()
+	s.pipes.restart()
 }
 
 func (s *scene) destroy() {

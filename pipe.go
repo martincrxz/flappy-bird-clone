@@ -101,3 +101,11 @@ func (ps *pipes) destroy() {
 	ps.texture.Destroy()
 	ps.mu.Unlock()
 }
+
+func (ps *pipes) hit(bird *bird) {
+	for _, p := range ps.pipes {
+		p.mu.RLock()
+		bird.hit(p)
+		p.mu.RUnlock()
+	}
+}
